@@ -1,11 +1,12 @@
 {
     "cSpell.words": [
-        "lapangan",
         "jadwal",
+        "Jadwaloperasional",
+        "lapangan",
+        "logstatus",
         "operasional",
-        "reservasi",
         "pembayaran",
-        "serializer",
-        "logstatus"
+        "reservasi",
+        "serializer"
     ]
 }
