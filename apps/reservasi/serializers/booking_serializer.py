@@ -21,7 +21,7 @@ class BookingSerializer(serializers.ModelSerializer):
             tanggal=tanggal,
             jam_mulai__lt=jam_selesai,
             jam_selesai__gt=jam_mulai,
-            status_booking__in=['menunggu', 'doterima']
+            status_booking__in=['menunggu', 'disetujui']
         ).exists()
 
         if bentrok:
