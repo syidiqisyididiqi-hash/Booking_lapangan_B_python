@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "Booking Lapangan API - Complete Testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Koleksi lengkap untuk testing API dengan JWT authentication"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login - Get JWT Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login berhasil - status 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response berisi access token', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('access');",
+              "  pm.expect(jsonData.access).to.be.a('string');",
+              "  pm.environment.set('access_token', jsonData.access);",
+              "});",
+              "",
+              "pm.test('Response berisi refresh token', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('refresh');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"dani\",\n  \"password\": \"dani123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/token/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "token", ""]
+        }
+      }
+    },
+    {
+      "name": "2. Get All Lapangan (dengan token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Dapat list lapangan - status 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response adalah array atau object', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.be.an('object').or.an('array');",
+              "});",
+              "",
+              "pm.test('Authorization header digunakan dengan benar', function () {",
+              "  pm.expect(pm.request.headers.get('Authorization')).to.be.ok;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservasi/lapangan/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["reservasi", "lapangan", ""]
+        }
+      }
+    },
+    {
+      "name": "3. Create Booking (dengan token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Booking berhasil dibuat - status 201', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response berisi booking id', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('id');",
+              "  pm.environment.set('booking_id', jsonData.id);",
+              "});",
+              "",
+              "pm.test('Status booking adalah menunggu', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.status_booking).to.equal('menunggu');",
+              "});",
+              "",
+              "pm.test('User terisi otomatis', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('user');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"lapangan\": 1,\n  \"tanggal\": \"2026-05-10\",\n  \"jam_mulai\": \"10:00:00\",\n  \"jam_selesai\": \"12:00:00\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservasi/booking/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["reservasi", "booking", ""]
+        }
+      }
+    },
+    {
+      "name": "4. Get Booking Detail",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Detail booking berhasil diambil - status 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response berisi data booking lengkap', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('id');",
+              "  pm.expect(jsonData).to.have.property('lapangan');",
+              "  pm.expect(jsonData).to.have.property('tanggal');",
+              "  pm.expect(jsonData).to.have.property('jam_mulai');",
+              "  pm.expect(jsonData).to.have.property('jam_selesai');",
+              "  pm.expect(jsonData).to.have.property('status_booking');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservasi/booking/{{booking_id}}/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["reservasi", "booking", "{{booking_id}}", ""]
+        }
+      }
+    },
+    {
+      "name": "5. Validation Test - Invalid Time",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Request ditolak - status 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('Response berisi error message tentang jam', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(JSON.stringify(jsonData)).to.include('Jam selesai harus lebih besar dari jam mulai');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"lapangan\": 1,\n  \"tanggal\": \"2026-05-10\",\n  \"jam_mulai\": \"14:00:00\",\n  \"jam_selesai\": \"12:00:00\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservasi/booking/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["reservasi", "booking", ""]
+        }
+      }
+    },
+    {
+      "name": "6. Validation Test - Past Date",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Request ditolak - status 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('Response berisi error message tentang tanggal', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(JSON.stringify(jsonData)).to.include('Tanggal booking harus hari ini atau di masa depan');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"lapangan\": 1,\n  \"tanggal\": \"2026-05-05\",\n  \"jam_mulai\": \"10:00:00\",\n  \"jam_selesai\": \"12:00:00\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservasi/booking/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["reservasi", "booking", ""]
+        }
+      }
+    }
+  ]
+}
