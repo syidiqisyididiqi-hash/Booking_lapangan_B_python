@@ -10,9 +10,9 @@ class BookingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if user.role == 'admin':
+        if getattr(user, 'role', None) == 'admin' or user.is_staff:
             return Booking.objects.all().order_by('-tanggal', '-jam_mulai')
-        
+
         return Booking.objects.filter(user=user).order_by('-tanggal', '-jam_mulai')
     
     def perform_create(self, serializer):
